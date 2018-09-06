@@ -38,7 +38,7 @@ function getUserIds(mirrors) {
 function listenToStream(handlePost) {
     return function() {
         const userIds = Object.keys(idToMirrorMap);
-        const filter = {follow: userIds.join(',')};
+        const filter = {follow: userIds.join(','), tweet_mode:"extended"};
         var stream = twitterClient.stream('statuses/filter', filter);
         stream.on('data', function (event) {
             const user = event && event.user;

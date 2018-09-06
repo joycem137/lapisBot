@@ -25,7 +25,8 @@ function post(mirror, post) {
  */
 function buildMastodonPostFromTwitterPost(mirror, twitterPost) {
     const {options} = mirror;
-    let status;
+    const {extended_tweet} = twitterPost;
+    let status = (extended_tweet && extended_tweet.full_text) || twitterPost.text;
     let cw_text;
 
     const isRetweet = !!twitterPost.retweeted_status;
@@ -44,8 +45,6 @@ function buildMastodonPostFromTwitterPost(mirror, twitterPost) {
         if (options.cw_level == "retweets") {
             cw_text = "Birdsite X-post: Retweet";
         }
-
-        status = twitterPost.text;
     } else if (isQuoteTweet || isReply) {
         if (!options.post_quote_tweets) {
             return false;
@@ -59,21 +58,24 @@ function buildMastodonPostFromTwitterPost(mirror, twitterPost) {
     } else if (isReply) {
         // It doesn't make sense to forward replies.
         return false;
-    } else {
-        status = twitterPost.text;
     }
 
     if (options.post_twitter_link) {
         const account_name = twitterPost.user.screen_name;
         const postId = twitterPost.id_str;
         status += "\n\n";
-        status += "https://twitter.com/" + account_name + "/status/" + postId;
+        if (extended_tweet) {
+            const {entities} = twitterPost;
+            const {urls} = entities || {};
+            const firstUrl = urls && urls[0];
+            status += firstUrl.url;
+        } else {
+            status += "https://twitter.com/" + account_name + "/status/" + postId;
+        }
     }
 
     if (options.cw_level === "always") {
         cw_text = "Birdsite X-post";
-    } else if (options.cw_level === "keyword") {
-
     }
 
     const mastoPost = {
