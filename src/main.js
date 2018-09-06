@@ -11,7 +11,6 @@ const {mirrors} = config;
 
 const mastodonApi = require('./mastodonApi');
 function handlePost(mirror, twitterPost) {
-    console.log("Handling twitter post " + JSON.stringify(twitterPost) + " for " + JSON.stringify(mirror.name));
     const mastoPost = mastodonApi.buildMastodonPostFromTwitterPost(mirror, twitterPost);
     if (mastoPost) {
         mastodonApi.post(mirror, mastoPost);

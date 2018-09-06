@@ -4,16 +4,15 @@
 var Masto = require('mastodon');
 
 function post(mirror, status) {
-    console.log("Posting " + JSON.stringify(status) + " to " + mirror.mastodon.account_name);
-    //var M = new Masto({
-    //    access_token: mirror.mastodon.access_token,
-    //    timeout_ms: 60*1000,  // optional HTTP request timeout to apply to all requests.
-    //    api_url: 'https://beach.city/api/v1/' // optional, defaults to https://mastodon.social/api/v1/
-    //});
-    //
-    //M.post('statuses', status).then(status => {
-    //    console.log('Published with result ' + JSON.stringify(status));
-    //});
+    var M = new Masto({
+        access_token: mirror.mastodon.access_token,
+        timeout_ms: 60*1000,  // optional HTTP request timeout to apply to all requests.
+        api_url: 'https://beach.city/api/v1/' // optional, defaults to https://mastodon.social/api/v1/
+    });
+
+    M.post('statuses', status).then(status => {
+        console.log("Published " + status.status + " to " + mirror.mastodon.account_name);
+    });
 }
 
 function buildMastodonPostFromTwitterPost(mirror, twitterPost) {
