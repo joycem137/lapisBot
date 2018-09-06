@@ -4,10 +4,12 @@
 var Masto = require('mastodon');
 
 function post(mirror, status) {
+    const accountParts = mirror.mastodon.account_name.split('@');
+    const instanceName = accountParts[1];
     var M = new Masto({
         access_token: mirror.mastodon.access_token,
         timeout_ms: 60*1000,  // optional HTTP request timeout to apply to all requests.
-        api_url: 'https://beach.city/api/v1/' // optional, defaults to https://mastodon.social/api/v1/
+        api_url: 'https://' + instanceName + '/api/v1/'
     });
 
     M.post('statuses', status).then(status => {
@@ -15,6 +17,12 @@ function post(mirror, status) {
     });
 }
 
+/*
+ * cw_level can be the following:
+ * always - Add twitter x-post to all posts
+ * retweets - Add CW to retweets
+ *
+ */
 function buildMastodonPostFromTwitterPost(mirror, twitterPost) {
     const {options = {}} = mirror;
     let status;
@@ -31,6 +39,7 @@ function buildMastodonPostFromTwitterPost(mirror, twitterPost) {
         if (!options.post_retweets) {
             return false;
         }
+        status = twitterPost.text;
     } else if (isQuoteTweet) {
         // NO!
         return false;
