@@ -6,12 +6,19 @@ const args = process.argv;
 var fs = require('fs');
 const configFile = args[2];
 var config = JSON.parse(fs.readFileSync(configFile, 'utf8'));
-const twitterConfig = config.twitter_credentials;
 
-const userNames = ["pandora_parrot"];
+const {mirrors} = config;
+
+const mastodonApi = require('./mastodonApi');
+function handlePost(mirror, twitterPost) {
+    console.log("Handling twitter post " + JSON.stringify(twitterPost) + " for " + JSON.stringify(mirror.name));
+    const mastoPost = mastodonApi.buildMastodonPostFromTwitterPost(mirror, twitterPost);
+    if (mastoPost) {
+        mastodonApi.post(mirror, mastoPost);
+    }
+}
 
 const twitter = require('./twitterApi');
-
-twitter.connect(twitterConfig)
-    .then(twitter.getUserIds(userNames))
-    .then(twitter.listenToStream);
+twitter.connect(config.twitter_credentials)
+    .then(twitter.getUserIds(mirrors))
+    .then(twitter.listenToStream(handlePost));
