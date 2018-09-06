@@ -3,7 +3,7 @@
  */
 var Masto = require('mastodon');
 
-function post(mirror, status) {
+function post(mirror, post) {
     const accountParts = mirror.mastodon.account_name.split('@');
     const instanceName = accountParts[1];
     var M = new Masto({
@@ -12,20 +12,21 @@ function post(mirror, status) {
         api_url: 'https://' + instanceName + '/api/v1/'
     });
 
-    M.post('statuses', status).then(status => {
-        console.log("Published " + status.status + " to " + mirror.mastodon.account_name);
+    M.post('statuses', post).then(result => {
+        console.log("Published " + post.status + " to " + mirror.mastodon.account_name);
     });
 }
 
 /*
  * cw_level can be the following:
  * always - Add twitter x-post to all posts
- * retweets - Add CW to retweets
- *
+ * retweets - Add CW to retweets and quote tweets only
+ * keyword - Add CW based on keywords
  */
 function buildMastodonPostFromTwitterPost(mirror, twitterPost) {
-    const {options = {}} = mirror;
+    const {options} = mirror;
     let status;
+    let cw_text;
 
     const isRetweet = !!twitterPost.retweeted_status;
     const isQuoteTweet = !!twitterPost.is_quote_status;
@@ -39,14 +40,25 @@ function buildMastodonPostFromTwitterPost(mirror, twitterPost) {
         if (!options.post_retweets) {
             return false;
         }
+
+        if (options.cw_level == "retweets") {
+            cw_text = "Birdsite X-post: Retweet";
+        }
+
         status = twitterPost.text;
-    } else if (isQuoteTweet) {
-        // NO!
-        return false;
-    } else if (isReply) {
-        if (!options.post_replies) {
+    } else if (isQuoteTweet || isReply) {
+        if (!options.post_quote_tweets) {
             return false;
         }
+
+        if (options.cw_level == "retweets") {
+            cw_text = "Birdsite X-post: Quote Tweet";
+        }
+
+        status = twitterPost.text;
+    } else if (isReply) {
+        // It doesn't make sense to forward replies.
+        return false;
     } else {
         status = twitterPost.text;
     }
@@ -58,13 +70,19 @@ function buildMastodonPostFromTwitterPost(mirror, twitterPost) {
         status += "https://twitter.com/" + account_name + "/status/" + postId;
     }
 
+    if (options.cw_level === "always") {
+        cw_text = "Birdsite X-post";
+    } else if (options.cw_level === "keyword") {
+
+    }
+
     const mastoPost = {
         status,
         visibility: options.visibility || 'public'
     };
 
-    if (options.cw_level === "always") {
-        mastoPost.spoiler_text = "Twitter X-post";
+    if (cw_text) {
+        mastoPost.spoiler_text = cw_text;
     }
 
     return mastoPost;

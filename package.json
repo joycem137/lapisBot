@@ -4,7 +4,7 @@
   "description": "Bot for mirroring mastodon and twitter",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/main.js config.json"
   },
   "author": "Joyce Mayorga and Avery Genetti",
   "license": "ISC",

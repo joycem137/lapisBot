@@ -44,7 +44,9 @@ function listenToStream(handlePost) {
             const user = event && event.user;
             if (user) {
                 const matchingMirror = idToMirrorMap[user.id_str];
-                handlePost(matchingMirror, event);
+                if (matchingMirror) {
+                    handlePost(matchingMirror, event);
+                }
             }
         });
 
