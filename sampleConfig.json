@@ -1,0 +1,27 @@
+{
+  "twitter_credentials": {
+    "consumer_key": "",
+    "consumer_secret": "",
+    "access_token_key": "",
+    "access_token_secret":""
+  },
+  "mirrors": [
+    {
+      "name": "Example Mirror",
+      "mastodon": {
+        "account_name": "exampleUser@mastodon.social",
+        "access_token": ""
+      },
+      "twitter": {
+        "account_name": "exampleBirdSite"
+      },
+      "options": {
+        "post_retweets": false,
+        "post_replies": false,
+        "post_twitter_link": true,
+        "cw_level": "always",
+        "visibilty": "unlisted"
+      }
+    }
+  ]
+}
