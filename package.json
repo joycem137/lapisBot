@@ -1,0 +1,19 @@
+{
+  "name": "lapis_bot",
+  "version": "0.0.1",
+  "description": "Bot for mirroring mastodon and twitter",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Joyce Mayorga and Avery Genetti",
+  "license": "ISC",
+  "dependencies": {
+    "jsPolyfills": "git://github.com/joycem137/jsPolyfills.git",
+    "mastodon": "^1.2.2",
+    "node-json-db": "^0.9.0",
+    "prompt-sync": "^4.1.5",
+    "readline-sync": "^1.4.7",
+    "twitter": "^1.7.1"
+  }
+}
